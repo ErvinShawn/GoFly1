@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:my_flutter_app/main_page.dart';
 
 class Dropdown extends StatelessWidget {
+  const Dropdown({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -11,14 +13,14 @@ class Dropdown extends StatelessWidget {
             children: [
               Container(
                 height: 150,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage('assets/goflybg.jpg'),
                     fit: BoxFit.cover,
                   ),
                 ),
               ),
-              Positioned(
+              const Positioned(
                 bottom: 10,
                 right: 20,
                 child: Text(
@@ -31,7 +33,7 @@ class Dropdown extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Center(
             child: Image.asset(
               'assets/aviao.gif',
@@ -40,12 +42,12 @@ class Dropdown extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           CustomImageButton(
             'Return to Home',
             () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => MainPage()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const MainPage()));
             },
             'assets/goflybg.jpg',
           ),
@@ -82,7 +84,7 @@ class Dropdown extends StatelessWidget {
 // Custom Image Button Widget with background image
 Widget CustomImageButton(String text, Function() onPressed, String imageUrl) {
   return Padding(
-    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
     child: ElevatedButton(
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.zero,
@@ -98,11 +100,11 @@ Widget CustomImageButton(String text, Function() onPressed, String imageUrl) {
           borderRadius: BorderRadius.circular(10),
         ),
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: 15),
+          padding: const EdgeInsets.symmetric(vertical: 15),
           alignment: Alignment.center,
           child: Text(
             text,
-            style: TextStyle(
+            style: const TextStyle(
                 fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
@@ -114,15 +116,17 @@ Widget CustomImageButton(String text, Function() onPressed, String imageUrl) {
 class FlightStatusPage extends StatelessWidget {
   final TextEditingController _controller = TextEditingController();
 
+  FlightStatusPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('GoFly'),
-        titleTextStyle: TextStyle(
+        title: const Text('GoFly'),
+        titleTextStyle: const TextStyle(
             color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
         flexibleSpace: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             image: DecorationImage(
               image:
                   AssetImage('assets/goflybg.jpg'), // AppBar background image
@@ -133,19 +137,19 @@ class FlightStatusPage extends StatelessWidget {
         backgroundColor:
             Colors.transparent, // To make the background image visible
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context); // Back button
           },
         ),
       ),
       body: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Title
-            Text(
+            const Text(
               'Flight Status',
               style: TextStyle(
                   color: Colors.purple,
@@ -153,16 +157,16 @@ class FlightStatusPage extends StatelessWidget {
                   fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             // Input field
             TextField(
               controller: _controller,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Enter Flight Number/PNR',
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             // Check button
             Align(
               alignment: Alignment.centerRight,
@@ -173,19 +177,19 @@ class FlightStatusPage extends StatelessWidget {
                     context: context,
                     builder: (context) {
                       return AlertDialog(
-                        title: Text('Flight Status'),
+                        title: const Text('Flight Status'),
                         content: Text('Flight status for: ${_controller.text}'),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: Text('Close'),
+                            child: const Text('Close'),
                           ),
                         ],
                       );
                     },
                   );
                 },
-                child: Text('Check'),
+                child: const Text('Check'),
               ),
             ),
           ],
@@ -196,15 +200,17 @@ class FlightStatusPage extends StatelessWidget {
 }
 
 class TicketDetailsPage extends StatelessWidget {
+  const TicketDetailsPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('GoFly'),
-          titleTextStyle: TextStyle(
+          title: const Text('GoFly'),
+          titleTextStyle: const TextStyle(
               color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
           flexibleSpace: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
                 image:
                     AssetImage('assets/goflybg.jpg'), // AppBar background image
@@ -215,16 +221,16 @@ class TicketDetailsPage extends StatelessWidget {
           backgroundColor:
               Colors.transparent, // To make the background image visible
           leading: IconButton(
-            icon: Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.pop(context); // Back button
             },
           ),
         ),
         body: ListView(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           children: [
-            Text(
+            const Text(
               'Ticket Details',
               style: TextStyle(
                   color: Colors.purple,
@@ -245,12 +251,14 @@ class TicketDetailsPage extends StatelessWidget {
 
 // Ticket Card Widget with background image
 class TicketCard extends StatelessWidget {
+  const TicketCard({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      margin: EdgeInsets.symmetric(vertical: 10),
-      child: Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: SizedBox(
         height: 150,
         child: Stack(
           children: [
@@ -264,7 +272,7 @@ class TicketCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Row(
                 children: [
                   Container(
@@ -275,9 +283,9 @@ class TicketCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  SizedBox(width: 20),
+                  const SizedBox(width: 20),
                   // Text inside the  card
-                  Expanded(
+                  const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -299,15 +307,17 @@ class TicketCard extends StatelessWidget {
 }
 
 class AboutUsPage extends StatelessWidget {
+  const AboutUsPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('GoFly'),
-        titleTextStyle: TextStyle(
+        title: const Text('GoFly'),
+        titleTextStyle: const TextStyle(
             color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
         flexibleSpace: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             image: DecorationImage(
               image:
                   AssetImage('assets/goflybg.jpg'), // AppBar background image
@@ -318,13 +328,13 @@ class AboutUsPage extends StatelessWidget {
         backgroundColor:
             Colors.transparent, // To make the background image visible
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context); // Back button
           },
         ),
       ),
-      body: Padding(
+      body: const Padding(
         padding: EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

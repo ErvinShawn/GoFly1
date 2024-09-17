@@ -4,15 +4,17 @@ import 'package:my_flutter_app/main_page.dart';
 import 'result_page.dart';
 
 class SearchPage extends StatelessWidget {
+  const SearchPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('GoFly'),
-        titleTextStyle: TextStyle(
+        title: const Text('GoFly'),
+        titleTextStyle: const TextStyle(
             color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
         flexibleSpace: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             image: DecorationImage(
               image:
                   AssetImage('assets/goflybg.jpg'), // AppBar background image
@@ -23,7 +25,7 @@ class SearchPage extends StatelessWidget {
         backgroundColor:
             Colors.transparent, // To make the background image visible
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context); // Back button
           },
@@ -46,14 +48,14 @@ class SearchPage extends StatelessWidget {
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 16),
-            TextField(
+            const SizedBox(height: 16),
+            const TextField(
               decoration: InputDecoration(
                 labelText: 'Date',
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -61,13 +63,13 @@ class SearchPage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => ResultPage()),
                 );
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.purple,
+              ),
               child: Text(
                 'Search',
                 style:
                     TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple,
               ),
             ),
           ],

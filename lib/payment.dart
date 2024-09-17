@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
 class PaymentPage extends StatelessWidget {
+  const PaymentPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('GoFly'),
-        titleTextStyle: TextStyle(
+        title: const Text('GoFly'),
+        titleTextStyle: const TextStyle(
             color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
         flexibleSpace: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             image: DecorationImage(
               image:
                   AssetImage('assets/goflybg.jpg'), // AppBar background image
@@ -24,7 +26,7 @@ class PaymentPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Center(
+            const Center(
               child: Text(
                 'Payment',
                 style: TextStyle(
@@ -33,22 +35,22 @@ class PaymentPage extends StatelessWidget {
                     fontSize: 30),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             buildTextFieldRow('BookingID:', 'Booking ID'),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             buildTextFieldRow('  User  ID:  ', 'User ID'),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             buildTextFieldRow('   Amount:  ', 'Amount'),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             buildPaymentContainer(context),
-            SizedBox(height: 20),
-            Center(
+            const SizedBox(height: 20),
+            const Center(
               child: Text(
                 "please click on the 'Confirm' button to initiate the transaction",
                 style: TextStyle(color: Colors.pink),
               ),
             ),
-            Spacer(),
+            const Spacer(),
             buildConfirmButton(context),
           ],
         ),
@@ -60,8 +62,8 @@ class PaymentPage extends StatelessWidget {
     return Row(
       children: [
         Text(label,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        SizedBox(width: 10),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        const SizedBox(width: 10),
         Expanded(
           child: TextField(
             readOnly: true, // To simulate backend population of fields
@@ -79,11 +81,11 @@ class PaymentPage extends StatelessWidget {
 
   Widget buildPaymentContainer(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.purple[50],
         borderRadius: BorderRadius.circular(20),
-        image: DecorationImage(
+        image: const DecorationImage(
           image: AssetImage('assets/goflybg.jpg'),
           fit: BoxFit.cover,
         ),
@@ -93,8 +95,8 @@ class PaymentPage extends StatelessWidget {
           Row(
             children: [
               Image.asset('assets/gpay.jpg', height: 30, width: 30),
-              SizedBox(width: 20),
-              Text(
+              const SizedBox(width: 20),
+              const Text(
                 'GPay',
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -103,15 +105,15 @@ class PaymentPage extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Row(
             children: [
-              Text('UPI ID:',
+              const Text('UPI ID:',
                   style: TextStyle(
                       fontSize: 16,
                       color: Colors.white,
                       fontWeight: FontWeight.bold)),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Expanded(
                 child: TextField(
                   decoration: InputDecoration(
@@ -124,17 +126,17 @@ class PaymentPage extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 10),
-          Center(
+          const SizedBox(height: 10),
+          const Center(
             child: Text(
-              'OR',
+              'QR',
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                   color: Colors.white),
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           TextButton(
             onPressed: () {
               Navigator.push(context,
@@ -145,9 +147,9 @@ class PaymentPage extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30),
               ),
-              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
             ),
-            child: Text(
+            child: const Text(
               'Click here for QR',
               style: TextStyle(color: Colors.white, fontSize: 16),
             ),
@@ -164,16 +166,16 @@ class PaymentPage extends StatelessWidget {
             context, MaterialPageRoute(builder: (context) => QRCodePage()));
       },
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 30),
+        padding: const EdgeInsets.symmetric(vertical: 30),
         width: double.infinity,
         decoration: BoxDecoration(
-          image: DecorationImage(
+          image: const DecorationImage(
             image: AssetImage('assets/goflybg.jpg'),
             fit: BoxFit.cover,
           ),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Center(
+        child: const Center(
           child: Text(
             'CONFIRM',
             style: TextStyle(
@@ -186,17 +188,19 @@ class PaymentPage extends StatelessWidget {
 }
 
 class QRCodePage extends StatelessWidget {
+  const QRCodePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.purple,
-        title: Text(
+        title: const Text(
           'GoFly',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -206,7 +210,7 @@ class QRCodePage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Center(
+            const Center(
               child: Text(
                 'Payment',
                 style: TextStyle(
@@ -215,16 +219,16 @@ class QRCodePage extends StatelessWidget {
                     fontSize: 24),
               ),
             ),
-            SizedBox(height: 20),
-            buildQRContainer(),
-            Spacer(),
-            Center(
+            const SizedBox(height: 20),
+            // buildQRContainer(),
+            const Spacer(),
+            const Center(
               child: Text(
                 "please click on the 'confirm' button to complete the transaction",
                 style: TextStyle(color: Colors.pink),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             buildConfirmButton(context),
           ],
         ),
@@ -234,18 +238,18 @@ class QRCodePage extends StatelessWidget {
 
   Widget buildQRContainer() {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.purple[50],
         borderRadius: BorderRadius.circular(20),
-        image: DecorationImage(
+        image: const DecorationImage(
           image: AssetImage('assets/qr_bg.jpg'), // Add QR background
           fit: BoxFit.cover,
         ),
       ),
       child: Column(
         children: [
-          Center(
+          const Center(
             child: Text(
               'QR Code',
               style: TextStyle(
@@ -254,7 +258,7 @@ class QRCodePage extends StatelessWidget {
                   color: Colors.black),
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Center(
             child: QrImage(
               data: "https://www.example.com", // Example QR data
@@ -273,16 +277,16 @@ class QRCodePage extends StatelessWidget {
         // Add desired functionality on confirm
       },
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 20),
+        padding: const EdgeInsets.symmetric(vertical: 20),
         width: double.infinity,
         decoration: BoxDecoration(
-          image: DecorationImage(
+          image: const DecorationImage(
             image: AssetImage('assets/goflybg.jpg'), // Footer background
             fit: BoxFit.cover,
           ),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Center(
+        child: const Center(
           child: Text(
             'CONFIRM',
             style: TextStyle(

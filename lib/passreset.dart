@@ -1,190 +1,96 @@
-import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:my_flutter_app/signin.dart';
-
-class OtpScreen extends StatefulWidget {
-  @override
-  _OtpScreenState createState() => _OtpScreenState();
-}
-
-class _OtpScreenState extends State<OtpScreen> {
-  TextEditingController otpController = TextEditingController();
-  int secondsRemaining = 60;
-  Timer? timer;
-
-  @override
-  void initState() {
-    super.initState();
-    startTimer();
-  }
-
-  void startTimer() {
-    timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
-        if (secondsRemaining > 0) {
-          secondsRemaining--;
-        } else {
-          timer.cancel();
-        }
-      });
-    });
-  }
-
-  void _showOtpErrorDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Error"),
-          content: Text("The OTP did not match/validity expired."),
-          actions: [
-            TextButton(
-              child: Text("Resend"),
-              onPressed: () {
-                Navigator.of(context).pop();
-                resendOtp();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void resendOtp() {
-    setState(() {
-      secondsRemaining = 60;
-    });
-    startTimer();
-    // Logic to resend OTP can be added here
-  }
-
-  void verifyOtp() {
-    // Replace with actual OTP matching logic
-    if (otpController.text == "123456") {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => PasswordResetScreen()),
-      );
-    } else {
-      _showOtpErrorDialog();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('GoFly'),
-        titleTextStyle: TextStyle(
-            color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/goflybg.jpg'),
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Enter the OTP delivered to the registered email:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16),
-            TextField(
-              controller: otpController,
-              decoration: InputDecoration(
-                hintText: 'OTP',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'valid for ${secondsRemaining}s',
-              style: TextStyle(fontSize: 12),
-            ),
-            SizedBox(height: 20),
-            Center(
-              child: InkWell(
-                onTap: verifyOtp,
-                child: Ink(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/goflybg.jpg'),
-                      fit: BoxFit.cover,
-                    ),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Container(
-                    height: 50,
-                    width: 150,
-                    alignment: Alignment.center,
-                    child: Text(
-                      'ENTER',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+import 'signin.dart'; // Import the sign-in screen
 
 class PasswordResetScreen extends StatefulWidget {
+  const PasswordResetScreen({super.key});
+
   @override
   _PasswordResetScreenState createState() => _PasswordResetScreenState();
 }
 
 class _PasswordResetScreenState extends State<PasswordResetScreen> {
-  TextEditingController newPasswordController = TextEditingController();
-  TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  bool isProcessing = false;
 
-  void resetPassword() {
-    if (newPasswordController.text == confirmPasswordController.text) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => SignInPage()),
-      );
-    } else {
+  Future<void> sendPasswordResetEmail() async {
+    if (emailController.text.isEmpty) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Error"),
-            content: Text("Passwords do not match."),
+            title: const Text("Error"),
+            content: const Text("Please enter an email address."),
             actions: [
               TextButton(
-                child: Text("OK"),
+                child: const Text("OK"),
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context).pop(); // Close the dialog
                 },
               ),
             ],
           );
         },
       );
+      return;
+    }
+
+    setState(() {
+      isProcessing = true;
+    });
+
+    try {
+      // Send password reset email
+      await FirebaseAuth.instance
+          .sendPasswordResetEmail(email: emailController.text);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Success"),
+            content: const Text(
+                "Password reset email sent! Please check your inbox."),
+            actions: [
+              TextButton(
+                child: const Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                  // Redirect to sign-in screen after 5 seconds
+                  Future.delayed(const Duration(seconds: 5), () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => SignInPage()),
+                    );
+                  });
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Error"),
+            content:
+                Text("Failed to send password reset email: ${e.toString()}"),
+            actions: [
+              TextButton(
+                child: const Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } finally {
+      setState(() {
+        isProcessing = false;
+      });
     }
   }
 
@@ -192,11 +98,11 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('GoFly'),
-        titleTextStyle: TextStyle(
+        title: const Text('GoFly'),
+        titleTextStyle: const TextStyle(
             color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
         flexibleSpace: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             image: DecorationImage(
               image: AssetImage('assets/goflybg.jpg'),
               fit: BoxFit.cover,
@@ -205,7 +111,7 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
         ),
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -216,61 +122,48 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Enter the New Password:',
+            const Text(
+              'Enter your email to receive a password reset link:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             TextField(
-              controller: newPasswordController,
+              controller: emailController,
               decoration: InputDecoration(
-                hintText: 'New Password',
+                hintText: 'Email',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
             ),
-            SizedBox(height: 16),
-            Text(
-              'Confirm the New Password:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16),
-            TextField(
-              controller: confirmPasswordController,
-              decoration: InputDecoration(
-                hintText: 'Confirm Password',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Center(
-              child: InkWell(
-                onTap: resetPassword,
-                child: Ink(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/goflybg.jpg'),
-                      fit: BoxFit.cover,
-                    ),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Container(
-                    height: 50,
-                    width: 150,
-                    alignment: Alignment.center,
-                    child: Text(
-                      'RESET',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+              child: isProcessing
+                  ? const CircularProgressIndicator()
+                  : InkWell(
+                      onTap: sendPasswordResetEmail,
+                      child: Ink(
+                        decoration: BoxDecoration(
+                          image: const DecorationImage(
+                            image: AssetImage('assets/goflybg.jpg'),
+                            fit: BoxFit.cover,
+                          ),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Container(
+                          height: 50,
+                          width: 150,
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'SEND EMAIL',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              ),
             ),
           ],
         ),

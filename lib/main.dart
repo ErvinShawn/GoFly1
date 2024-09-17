@@ -8,23 +8,22 @@ import 'package:my_flutter_app/signup.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
-
 void main() async {
   await Firebase.initializeApp(
-
     options: DefaultFirebaseOptions.currentPlatform,
-
-);
+  );
   runApp(GoFlyApp());
 }
 
 class GoFlyApp extends StatelessWidget {
+  const GoFlyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       routes: {
-        '/main': (context) => MainPage(),
+        '/main': (context) => const MainPage(),
         '/search': (context) => SearchPage(),
         '/profile': (context) => ProfilePage(),
         '/menu': (context) => Dropdown(),
@@ -40,15 +39,17 @@ class GoFlyApp extends StatelessWidget {
 }
 
 class WelcomePage extends StatelessWidget {
+  const WelcomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('GoFly'),
-        titleTextStyle: TextStyle(
+        title: const Text('GoFly'),
+        titleTextStyle: const TextStyle(
             color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
         flexibleSpace: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             image: DecorationImage(
               image:
                   AssetImage('assets/goflybg.jpg'), // AppBar background image
@@ -62,11 +63,11 @@ class WelcomePage extends StatelessWidget {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              const Color.fromARGB(255, 255, 255, 255),
-              const Color.fromARGB(255, 255, 255, 255)
+              Color.fromARGB(255, 255, 255, 255),
+              Color.fromARGB(255, 255, 255, 255)
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -75,15 +76,16 @@ class WelcomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               'Welcome to GoFly',
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: const Color.fromARGB(255, 64, 27, 85),
+                color: Color.fromARGB(255, 64, 27, 85),
               ),
             ),
-            SizedBox(height: 30), // Adjust distance between text and image
+            const SizedBox(
+                height: 30), // Adjust distance between text and image
 
             // Image with rounded borders
             ClipRRect(
@@ -95,14 +97,15 @@ class WelcomePage extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-            SizedBox(height: 30), // Adjust distance between image and buttons
+            const SizedBox(
+                height: 30), // Adjust distance between image and buttons
 
             // Modified Button with Background Image (Sign In)
             SizedBox(
               width: 250,
               child: Container(
                 decoration: BoxDecoration(
-                  image: DecorationImage(
+                  image: const DecorationImage(
                     image: AssetImage('assets/goflybg.jpg'),
                     fit: BoxFit.cover,
                   ),
@@ -110,7 +113,8 @@ class WelcomePage extends StatelessWidget {
                 ),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 50, vertical: 20),
                     backgroundColor:
                         Colors.transparent, // Make background transparent
                     shape: RoundedRectangleBorder(
@@ -123,21 +127,21 @@ class WelcomePage extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => SignInPage()),
                     );
                   },
-                  child: Text(
+                  child: const Text(
                     'SIGN IN',
                     style: TextStyle(color: Colors.white, fontSize: 18),
                   ),
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Modified Button with Background Image (Sign Up)
             SizedBox(
               width: 250,
               child: Container(
                 decoration: BoxDecoration(
-                  image: DecorationImage(
+                  image: const DecorationImage(
                     image: AssetImage('assets/goflybg.jpg'),
                     fit: BoxFit.cover,
                   ),
@@ -145,7 +149,8 @@ class WelcomePage extends StatelessWidget {
                 ),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 50, vertical: 20),
                     backgroundColor:
                         Colors.transparent, // Make background transparent
                     shape: RoundedRectangleBorder(
@@ -158,8 +163,43 @@ class WelcomePage extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => SignUpPage()),
                     );
                   },
-                  child: Text(
+                  child: const Text(
                     'SIGN UP',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            //admin sign up
+            SizedBox(
+              width: 250,
+              child: Container(
+                decoration: BoxDecoration(
+                  image: const DecorationImage(
+                    image: AssetImage('assets/goflybg.jpg'),
+                    fit: BoxFit.cover,
+                  ),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 50, vertical: 20),
+                    backgroundColor:
+                        Colors.transparent, // Make background transparent
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SignUpPage()),
+                    );
+                  },
+                  child: const Text(
+                    'Admin',
                     style: TextStyle(color: Colors.white, fontSize: 18),
                   ),
                 ),

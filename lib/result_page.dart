@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:my_flutter_app/flightdetails.dart';
 
 class ResultPage extends StatelessWidget {
+  const ResultPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('GoFly'),
-        titleTextStyle: TextStyle(
+        title: const Text('GoFly'),
+        titleTextStyle: const TextStyle(
             color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
         flexibleSpace: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             image: DecorationImage(
               image:
                   AssetImage('assets/goflybg.jpg'), // AppBar background image
@@ -21,7 +23,7 @@ class ResultPage extends StatelessWidget {
         backgroundColor:
             Colors.transparent, // To make the background image visible
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context); // Back button
           },
@@ -29,8 +31,8 @@ class ResultPage extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
+          const Padding(
+            padding: EdgeInsets.all(16.0),
             child: Text(
               'Search Results',
               style: TextStyle(
@@ -42,14 +44,14 @@ class ResultPage extends StatelessWidget {
           ),
           Expanded(
             child: ListView(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               children: [
                 buildResultCard(context, 'Flight 1'),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 buildResultCard(context, 'Flight 2'),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 buildResultCard(context, 'Flight 3'),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 buildResultCard(context, 'Flight 4'),
               ],
             ),
@@ -65,7 +67,7 @@ class ResultPage extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => FlightDetailsPage()),
+          MaterialPageRoute(builder: (context) => const FlightDetailsPage()),
         );
       },
       child: Card(
@@ -75,7 +77,7 @@ class ResultPage extends StatelessWidget {
         child: Container(
           height: 100,
           decoration: BoxDecoration(
-            image: DecorationImage(
+            image: const DecorationImage(
               image: AssetImage('assets/purple clouds.jpg'),
               fit: BoxFit.cover,
             ),
@@ -84,7 +86,7 @@ class ResultPage extends StatelessWidget {
           child: Center(
             child: Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
