@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1023748480701",
+    "project_id": "gofly-baf6f",
+    "storage_bucket": "gofly-baf6f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1023748480701:android:3865e395366483440de1d4",
+        "android_client_info": {
+          "package_name": "com.example.my_flutter_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVboiyWUVxTc0D8dDGOFBH2T95F6wf3F0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
