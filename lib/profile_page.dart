@@ -175,7 +175,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.purple,
                     ),
-                    child: Text(
+                    child: const Text(
                       'Save Profile',
                       style: TextStyle(
                           color: Colors.white, fontWeight: FontWeight.bold),
@@ -190,7 +190,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                     ),
-                    child: Text(
+                    child: const Text(
                       'Edit Profile',
                       style: TextStyle(
                           color: Colors.white, fontWeight: FontWeight.bold),
@@ -207,7 +207,7 @@ class _ProfilePageState extends State<ProfilePage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 247, 1, 255),
               ),
-              child: Text(
+              child: const Text(
                 'Log Out',
                 style:
                     TextStyle(color: Colors.white, fontWeight: FontWeight.bold),

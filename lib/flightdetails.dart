@@ -64,7 +64,7 @@ class FlightDetailsPage extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => BookingPage()),
+                    MaterialPageRoute(builder: (context) => const BookingPage()),
                   );
                 },
                 style: ElevatedButton.styleFrom(

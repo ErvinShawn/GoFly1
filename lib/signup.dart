@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'main_page.dart'; // Importing main_page to navigate
 
 class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
+
   @override
   _SignUpPageState createState() => _SignUpPageState();
 }
@@ -17,8 +19,9 @@ class _SignUpPageState extends State<SignUpPage> {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
       Navigator.pushReplacement(
+        // ignore: use_build_context_synchronously
         context,
-        MaterialPageRoute(builder: (context) => MainPage()),
+        MaterialPageRoute(builder: (context) => const MainPage()),
       );
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
@@ -38,14 +41,14 @@ class _SignUpPageState extends State<SignUpPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Error'),
+        title: const Text('Error'),
         content: Text(message),
         actions: <Widget>[
           TextButton(
             onPressed: () {
               Navigator.of(ctx).pop();
             },
-            child: Text('Okay'),
+            child: const Text('Okay'),
           ),
         ],
       ),
@@ -68,30 +71,32 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('GoFly'),
-        titleTextStyle: TextStyle(
+        title: const Text('GoFly'),
+        titleTextStyle: const TextStyle(
           color: Colors.white,
           fontSize: 32,
           fontWeight: FontWeight.bold,
         ),
         flexibleSpace: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             image: DecorationImage(
-              image: AssetImage('assets/goflybg.jpg'), // AppBar background image
+              image:
+                  AssetImage('assets/goflybg.jpg'), // AppBar background image
               fit: BoxFit.cover,
             ),
           ),
         ),
-        backgroundColor: Colors.transparent, // To make the background image visible
+        backgroundColor:
+            Colors.transparent, // To make the background image visible
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context); // Back button
           },
         ),
       ),
       body: Container(
-        padding: EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20.0),
         child: Form(
           key: _formKey,
           child: Column(
@@ -99,16 +104,16 @@ class _SignUpPageState extends State<SignUpPage> {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  image: DecorationImage(
+                  image: const DecorationImage(
                     image: AssetImage('assets/goflybg.jpg'),
                     fit: BoxFit.cover,
                   ),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    Container(
+                    SizedBox(
                       height: 60,
                       width: double.infinity,
                       child: TextFormField(
@@ -131,8 +136,8 @@ class _SignUpPageState extends State<SignUpPage> {
                         },
                       ),
                     ),
-                    SizedBox(height: 20),
-                    Container(
+                    const SizedBox(height: 20),
+                    SizedBox(
                       height: 60,
                       width: double.infinity,
                       child: TextFormField(
@@ -155,8 +160,8 @@ class _SignUpPageState extends State<SignUpPage> {
                         },
                       ),
                     ),
-                    SizedBox(height: 20),
-                    Container(
+                    const SizedBox(height: 20),
+                    SizedBox(
                       height: 60,
                       width: double.infinity,
                       child: TextFormField(
@@ -180,8 +185,8 @@ class _SignUpPageState extends State<SignUpPage> {
                         },
                       ),
                     ),
-                    SizedBox(height: 20),
-                    Container(
+                    const SizedBox(height: 20),
+                    SizedBox(
                       height: 60,
                       width: double.infinity,
                       child: TextFormField(
@@ -208,13 +213,13 @@ class _SignUpPageState extends State<SignUpPage> {
                   ],
                 ),
               ),
-              SizedBox(height: 40),
+              const SizedBox(height: 40),
               Container(
                 width: 200,
                 height: 60,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(30),
-                  image: DecorationImage(
+                  image: const DecorationImage(
                     image: AssetImage('assets/goflybg.jpg'),
                     fit: BoxFit.cover,
                   ),
@@ -228,7 +233,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                   onPressed: _trySignUp,
-                  child: Text(
+                  child: const Text(
                     'Sign Up',
                     style: TextStyle(
                       color: Colors.white,

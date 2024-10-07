@@ -140,7 +140,7 @@ class PaymentPage extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => QRCodePage()));
+                  MaterialPageRoute(builder: (context) => const QRCodePage()));
             },
             style: TextButton.styleFrom(
               backgroundColor: Colors.grey[500],
@@ -163,7 +163,7 @@ class PaymentPage extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => QRCodePage()));
+            context, MaterialPageRoute(builder: (context) => const QRCodePage()));
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 30),

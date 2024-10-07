@@ -63,7 +63,7 @@ class Dropdown extends StatelessWidget {
             'Ticket Details',
             () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => TicketDetailsPage()));
+                  MaterialPageRoute(builder: (context) => const TicketDetailsPage()));
             },
             'assets/goflybg.jpg',
           ),
@@ -71,7 +71,7 @@ class Dropdown extends StatelessWidget {
             'About Us',
             () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => AboutUsPage()));
+                  MaterialPageRoute(builder: (context) => const AboutUsPage()));
             },
             'assets/goflybg.jpg',
           ),
@@ -229,8 +229,8 @@ class TicketDetailsPage extends StatelessWidget {
         ),
         body: ListView(
           padding: const EdgeInsets.all(20),
-          children: [
-            const Text(
+          children: const [
+            Text(
               'Ticket Details',
               style: TextStyle(
                   color: Colors.purple,

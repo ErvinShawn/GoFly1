@@ -109,9 +109,9 @@ class BookingPage extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
-                    SizedBox(
+                    const SizedBox(
                       width: double.infinity,
-                      child: const TextField(
+                      child: TextField(
                         enabled: false,
                         decoration: InputDecoration(
                           hintText: '',
@@ -127,9 +127,9 @@ class BookingPage extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
-                    SizedBox(
+                    const SizedBox(
                       width: double.infinity,
-                      child: const TextField(
+                      child: TextField(
                         enabled: false,
                         decoration: InputDecoration(
                           hintText: '',
@@ -140,16 +140,16 @@ class BookingPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    Row(
+                    const Row(
                       children: [
-                        const Text(
+                        Text(
                           'Passengers:',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(width: 10),
+                        SizedBox(width: 10),
                         SizedBox(
                           width: 50,
-                          child: const TextField(
+                          child: TextField(
                             decoration: InputDecoration(
                               border: OutlineInputBorder(),
                               filled: true,
@@ -207,9 +207,9 @@ class BookingPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    SizedBox(
+                    const SizedBox(
                       width: double.infinity,
-                      child: const TextField(
+                      child: TextField(
                         enabled: false,
                         decoration: InputDecoration(
                           hintText: 'AMOUNT PAYABLE',
@@ -231,7 +231,7 @@ class BookingPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => PaymentPage()),
+                              builder: (context) => const PaymentPage()),
                         );
                       },
                       child: const Text('Proceed to Pay',

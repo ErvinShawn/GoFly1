@@ -59,7 +59,7 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
                   Future.delayed(const Duration(seconds: 5), () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => SignInPage()),
+                      MaterialPageRoute(builder: (context) => const SignInPage()),
                     );
                   });
                 },

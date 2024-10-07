@@ -60,13 +60,13 @@ class SearchPage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ResultPage()),
+                  MaterialPageRoute(builder: (context) => const ResultPage()),
                 );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.purple,
               ),
-              child: Text(
+              child: const Text(
                 'Search',
                 style:
                     TextStyle(color: Colors.white, fontWeight: FontWeight.bold),

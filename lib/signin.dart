@@ -5,7 +5,7 @@ import 'package:my_flutter_app/passreset.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SignInPage extends StatefulWidget {
-  SignInPage({super.key});
+  const SignInPage({super.key});
 
   @override
   _SignInPageState createState() => _SignInPageState();
@@ -173,7 +173,7 @@ class _SignInPageState extends State<SignInPage> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => SignUpPage()),
+                      MaterialPageRoute(builder: (context) => const SignUpPage()),
                     );
                   },
                   child: const Text(
@@ -200,7 +200,7 @@ class _SignInPageState extends State<SignInPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => PasswordResetScreen()),
+                          builder: (context) => const PasswordResetScreen()),
                     );
                   },
                   child: const Text(

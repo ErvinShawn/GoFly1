@@ -7,12 +7,14 @@ import 'package:my_flutter_app/signin.dart';
 import 'package:my_flutter_app/signup.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(GoFlyApp());
+  runApp(const GoFlyApp());
 }
 
 class GoFlyApp extends StatelessWidget {
@@ -24,16 +26,16 @@ class GoFlyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routes: {
         '/main': (context) => const MainPage(),
-        '/search': (context) => SearchPage(),
-        '/profile': (context) => ProfilePage(),
-        '/menu': (context) => Dropdown(),
-        '/entry': (context) => WelcomePage(),
+        '/search': (context) => const SearchPage(),
+        '/profile': (context) => const ProfilePage(),
+        '/menu': (context) => const Dropdown(),
+        '/entry': (context) => const WelcomePage(),
       },
       title: 'GoFly',
       theme: ThemeData(
         primarySwatch: Colors.purple,
       ),
-      home: WelcomePage(),
+      home: const WelcomePage(),
     );
   }
 }
@@ -124,7 +126,8 @@ class WelcomePage extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => SignInPage()),
+                      MaterialPageRoute(
+                          builder: (context) => const SignInPage()),
                     );
                   },
                   child: const Text(
@@ -160,7 +163,8 @@ class WelcomePage extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => SignUpPage()),
+                      MaterialPageRoute(
+                          builder: (context) => const SignUpPage()),
                     );
                   },
                   child: const Text(
@@ -195,11 +199,12 @@ class WelcomePage extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => SignUpPage()),
+                      MaterialPageRoute(
+                          builder: (context) => const SignUpPage()),
                     );
                   },
                   child: const Text(
-                    'Admin',
+                    'ADMIN',
                     style: TextStyle(color: Colors.white, fontSize: 18),
                   ),
                 ),
