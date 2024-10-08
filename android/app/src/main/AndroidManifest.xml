@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+
     <application
         android:label="GoFly"
         android:name="${applicationName}"
@@ -41,5 +44,10 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
+
+        <package android:name="com.google.android.apps.nbu.paisa.user" /> <!-- Google Pay -->
+        <package android:name="net.one97.paytm" /> <!-- Paytm -->
+        <package android:name="com.phonepe.app" /> <!-- PhonePe -->
+        <package android:name="in.org.npci.upiapp" /> <!-- BHIM UPI -->
     </queries>
 </manifest>

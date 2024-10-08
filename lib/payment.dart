@@ -1,7 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:upi_india/upi_india.dart';
 
-class PaymentPage extends StatelessWidget {
+class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key});
+
+  @override
+  _PaymentPageState createState() => _PaymentPageState();
+}
+
+class _PaymentPageState extends State<PaymentPage> {
+  UpiIndia _upiIndia = UpiIndia();
+  UpiResponse? _transaction;
+
+  String bookingId = '1000';
+  String userId = '100';
+  double amount = 1.00; // Default payment amount
+
+  Future<void> initiateTransaction() async {
+    UpiResponse response = await _upiIndia.startTransaction(
+      app: UpiApp.googlePay, // Specify Google Pay as the UPI app
+      receiverUpiId: 'ervindacosta17@oksbi', // Example UPI ID (replace with real one)
+      receiverName: 'Ervin Da Costa', // Example merchant name
+      transactionRefId: 'TID123456789', // Example transaction reference ID
+      transactionNote: 'Payment for booking', // Description of payment
+      amount: amount, // Amount to be paid
+    );
+
+    setState(() {
+      _transaction = response;
+    });
+  }
+
+  Widget displayTransactionStatus() {
+    if (_transaction == null) {
+      return const Text("Transaction Status: Not Initiated");
+    }
+    switch (_transaction!.status) {
+      case UpiPaymentStatus.SUCCESS:
+        return const Text("Transaction Status: Success");
+      case UpiPaymentStatus.FAILURE:
+        return const Text("Transaction Status: Failure");
+      case UpiPaymentStatus.SUBMITTED:
+        return const Text("Transaction Status: Submitted");
+      default:
+        return const Text("Transaction Status: Unknown");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,8 +57,7 @@ class PaymentPage extends StatelessWidget {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
-              image:
-                  AssetImage('assets/goflybg.jpg'), // AppBar background image
+              image: AssetImage('assets/goflybg.jpg'), // AppBar background image
               fit: BoxFit.cover,
             ),
           ),
@@ -36,11 +79,11 @@ class PaymentPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            buildTextFieldRow('BookingID:', 'Booking ID'),
+            buildTextFieldRow('BookingID:', bookingId),
             const SizedBox(height: 10),
-            buildTextFieldRow('  User  ID:  ', 'User ID'),
+            buildTextFieldRow('  User  ID:  ', userId),
             const SizedBox(height: 10),
-            buildTextFieldRow('   Amount:  ', 'Amount'),
+            buildTextFieldRow('   Amount:  ', '₹$amount'),
             const SizedBox(height: 20),
             buildPaymentContainer(context),
             const SizedBox(height: 20),
@@ -50,6 +93,8 @@ class PaymentPage extends StatelessWidget {
                 style: TextStyle(color: Colors.pink),
               ),
             ),
+            const SizedBox(height: 20),
+            displayTransactionStatus(),
             const Spacer(),
             buildConfirmButton(context),
           ],
@@ -58,7 +103,7 @@ class PaymentPage extends StatelessWidget {
     );
   }
 
-  Widget buildTextFieldRow(String label, String placeholder) {
+  Widget buildTextFieldRow(String label, String value) {
     return Row(
       children: [
         Text(label,
@@ -66,9 +111,9 @@ class PaymentPage extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: TextField(
-            readOnly: true, // To simulate backend population of fields
+            readOnly: true,
             decoration: InputDecoration(
-              hintText: placeholder,
+              hintText: value,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -78,6 +123,7 @@ class PaymentPage extends StatelessWidget {
       ],
     );
   }
+
 
   Widget buildPaymentContainer(BuildContext context) {
     return Container(
@@ -137,7 +183,7 @@ class PaymentPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          TextButton(
+          /*TextButton(
             onPressed: () {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const QRCodePage()));
@@ -153,17 +199,19 @@ class PaymentPage extends StatelessWidget {
               'Click here for QR',
               style: TextStyle(color: Colors.white, fontSize: 16),
             ),
-          ),
+          ),*/
         ],
       ),
     );
   }
 
+  
+
+
   Widget buildConfirmButton(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => const QRCodePage()));
+        initiateTransaction(); // Initiating UPI transaction on Confirm button click
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 30),
@@ -185,121 +233,4 @@ class PaymentPage extends StatelessWidget {
       ),
     );
   }
-}
-
-class QRCodePage extends StatelessWidget {
-  const QRCodePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.purple,
-        title: const Text(
-          'GoFly',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            const Center(
-              child: Text(
-                'Payment',
-                style: TextStyle(
-                    color: Colors.purple,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24),
-              ),
-            ),
-            const SizedBox(height: 20),
-            // buildQRContainer(),
-            const Spacer(),
-            const Center(
-              child: Text(
-                "please click on the 'confirm' button to complete the transaction",
-                style: TextStyle(color: Colors.pink),
-              ),
-            ),
-            const SizedBox(height: 20),
-            buildConfirmButton(context),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildQRContainer() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.purple[50],
-        borderRadius: BorderRadius.circular(20),
-        image: const DecorationImage(
-          image: AssetImage('assets/qr_bg.jpg'), // Add QR background
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: Column(
-        children: [
-          const Center(
-            child: Text(
-              'QR Code',
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Colors.black),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Center(
-            child: QrImage(
-              data: "https://www.example.com", // Example QR data
-              version: QrVersions.auto,
-              size: 200.0,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildConfirmButton(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // Add desired functionality on confirm
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        width: double.infinity,
-        decoration: BoxDecoration(
-          image: const DecorationImage(
-            image: AssetImage('assets/goflybg.jpg'), // Footer background
-            fit: BoxFit.cover,
-          ),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: const Center(
-          child: Text(
-            'CONFIRM',
-            style: TextStyle(
-                fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
-          ),
-        ),
-      ),
-    );
-  }
-
-  QrImage({required String data, required version, required double size}) {}
-}
-
-class QrVersions {
-  static var auto;
 }
