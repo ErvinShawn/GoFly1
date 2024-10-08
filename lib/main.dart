@@ -102,7 +102,6 @@ class WelcomePage extends StatelessWidget {
             const SizedBox(
                 height: 30), // Adjust distance between image and buttons
 
-            // Modified Button with Background Image (Sign In)
             SizedBox(
               width: 250,
               child: Container(

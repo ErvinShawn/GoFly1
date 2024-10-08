@@ -8,6 +8,28 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //I added this Retrieval of User Data paert
+    final TextEditingController sourceController = TextEditingController();
+    final TextEditingController DestinationController = TextEditingController();
+    final TextEditingController DateController = TextEditingController();
+
+    //The datepicker funstion is added over here
+    Future<void> selectDate(BuildContext context) async {
+      DateTime? selectedDate = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime.now(),
+        lastDate: DateTime(2101),
+      );
+
+      if (selectedDate != null) {
+        String formattedDate =
+            "${selectedDate.toLocal()}".split(' ')[0]; // YYYY-MM-DD format
+        DateController.text =
+            formattedDate; // Set the selected date in the text field
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('GoFly'),
@@ -49,12 +71,16 @@ class SearchPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Date',
-                border: OutlineInputBorder(),
-              ),
-            ),
+            TextField(
+                controller: DateController, // this shit takes in the date input
+                decoration: const InputDecoration(
+                  labelText: 'Date',
+                  border: OutlineInputBorder(),
+                ),
+                readOnly: true,
+                onTap: () {
+                  selectDate(context);
+                }),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
