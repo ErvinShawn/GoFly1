@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-// ignore: unused_import
-import 'package:my_flutter_app/main_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
+import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
 import 'result_page.dart';
 
 class SearchPage extends StatelessWidget {
@@ -8,12 +8,10 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //I added this Retrieval of User Data paert
     final TextEditingController sourceController = TextEditingController();
-    final TextEditingController DestinationController = TextEditingController();
-    final TextEditingController DateController = TextEditingController();
+    final TextEditingController destinationController = TextEditingController();
+    final TextEditingController dateController = TextEditingController();
 
-    //The datepicker funstion is added over here
     Future<void> selectDate(BuildContext context) async {
       DateTime? selectedDate = await showDatePicker(
         context: context,
@@ -25,8 +23,92 @@ class SearchPage extends StatelessWidget {
       if (selectedDate != null) {
         String formattedDate =
             "${selectedDate.toLocal()}".split(' ')[0]; // YYYY-MM-DD format
-        DateController.text =
+        dateController.text =
             formattedDate; // Set the selected date in the text field
+      }
+    }
+
+    // Function to show dialog popups
+    Future<void> showPopup(BuildContext context, String message) async {
+      return showDialog<void>(
+        context: context,
+        barrierDismissible:
+            false, // Dialog cannot be dismissed by tapping outside
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Search Result'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Text(message),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    void searchFlights() async {
+      // Check if the user is signed in
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user == null) {
+        showPopup(context, 'You need to be signed in to search for flights.');
+        return;
+      }
+
+      // Fetch data from Firestore
+      String source = sourceController.text;
+      String destination = destinationController.text;
+      String date = dateController.text;
+
+      if (source.isEmpty || destination.isEmpty || date.isEmpty) {
+        showPopup(context, 'Please fill in all fields.');
+        return;
+      }
+
+      // Parse the selected date
+      DateTime selectedDate = DateTime.parse(date);
+      DateTime startOfDay =
+          DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+      DateTime endOfDay = startOfDay.add(const Duration(days: 1));
+
+      try {
+        // Query Firestore with consistent collection name 'Flights'
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+            .collection('Flights') // Use 'Flights' collection name here
+            .where('source', isEqualTo: source)
+            .where('destination', isEqualTo: destination)
+            .where('arrival_time', isGreaterThanOrEqualTo: startOfDay)
+            .where('arrival_time', isLessThan: endOfDay)
+            .get();
+
+        // Check if documents are retrieved
+        if (querySnapshot.docs.isEmpty) {
+          showPopup(context, 'No flights found for the selected criteria.');
+        } else {
+          showPopup(context, 'Flight found!');
+          // Pass the results to the ResultPage
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ResultPage(flights: querySnapshot.docs),
+            ),
+          );
+        }
+      } catch (e) {
+        // Handle any errors
+        print('Error fetching flights: $e');
+        showPopup(context, 'Failed to fetch flights.');
       }
     }
 
@@ -44,12 +126,11 @@ class SearchPage extends StatelessWidget {
             ),
           ),
         ),
-        backgroundColor:
-            Colors.transparent, // To make the background image visible
+        backgroundColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context); // Back button
+            Navigator.pop(context);
           },
         ),
       ),
@@ -57,38 +138,36 @@ class SearchPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            const TextField(
-              decoration: InputDecoration(
+            TextField(
+              controller: sourceController,
+              decoration: const InputDecoration(
                 labelText: 'From (Source)',
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
-            const TextField(
-              decoration: InputDecoration(
+            TextField(
+              controller: destinationController,
+              decoration: const InputDecoration(
                 labelText: 'To (Destination)',
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
             TextField(
-                controller: DateController, // this shit takes in the date input
-                decoration: const InputDecoration(
-                  labelText: 'Date',
-                  border: OutlineInputBorder(),
-                ),
-                readOnly: true,
-                onTap: () {
-                  selectDate(context);
-                }),
+              controller: dateController,
+              decoration: const InputDecoration(
+                labelText: 'Date',
+                border: OutlineInputBorder(),
+              ),
+              readOnly: true,
+              onTap: () {
+                selectDate(context);
+              },
+            ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ResultPage()),
-                );
-              },
+              onPressed: searchFlights,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.purple,
               ),

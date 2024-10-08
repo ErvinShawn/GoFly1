@@ -2,7 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:my_flutter_app/bookingdetails.dart';
 
 class FlightDetailsPage extends StatelessWidget {
-  const FlightDetailsPage({super.key});
+  final String flightName;
+  final String source;
+  final String destination;
+  final String arrivalTime;
+  final String departureTime;
+  final int economyPrice;
+  final int businessPrice;
+  final int firstClassPrice;
+  final int economySeats;
+  final int businessSeats;
+  final int firstClassSeats;
+
+  const FlightDetailsPage({
+    super.key,
+    required this.flightName,
+    required this.source,
+    required this.destination,
+    required this.arrivalTime,
+    required this.departureTime,
+    required this.economyPrice,
+    required this.businessPrice,
+    required this.firstClassPrice,
+    required this.economySeats,
+    required this.businessSeats,
+    required this.firstClassSeats,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +57,6 @@ class FlightDetailsPage extends StatelessWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Center(
               child: Text(
@@ -44,40 +68,40 @@ class FlightDetailsPage extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 15),
-            buildReadOnlyField('Airline'),
-            buildReadOnlyField('Flight number'),
-            buildReadOnlyField('Source'),
-            buildReadOnlyField('Destination'),
-            buildReadOnlyField('dd/mm/yyyy'),
-            buildReadOnlyField('Duration'),
-            buildReadOnlyField('Economy price'),
-            buildReadOnlyField('No of seats'),
-            buildReadOnlyField('Business price'),
-            buildReadOnlyField('No of seats'),
-            buildReadOnlyField('First class price'),
-            buildReadOnlyField('No of seats'),
-            buildReadOnlyField('Status'),
-            const SizedBox(height: 15),
+            const SizedBox(height: 20),
+            buildTicketDetailCard('Airline', flightName),
+            buildTicketDetailCard('Source', source),
+            buildTicketDetailCard('Destination', destination),
+            buildTicketDetailCard('Departure', departureTime),
+            buildTicketDetailCard('Arrival', arrivalTime),
+            buildTicketDetailCard('Economy Price', '₹$economyPrice'),
+            buildTicketDetailCard('Economy Seats', economySeats.toString()),
+            buildTicketDetailCard('Business Price', '₹$businessPrice'),
+            buildTicketDetailCard('Business Seats', businessSeats.toString()),
+            buildTicketDetailCard('First Class Price', '₹$firstClassPrice'),
+            buildTicketDetailCard(
+                'First Class Seats', firstClassSeats.toString()),
+            const SizedBox(height: 20),
             Center(
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const BookingPage()),
+                    MaterialPageRoute(
+                        builder: (context) => const BookingPage()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.purple,
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                      const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
                 child: const Text(
-                  'Save',
-                  style: TextStyle(fontSize: 12, color: Colors.white),
+                  'Continue',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),
             ),
@@ -87,19 +111,45 @@ class FlightDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget buildReadOnlyField(String placeholder) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: TextField(
-        enabled: false,
-        decoration: InputDecoration(
-          labelText: placeholder,
-          labelStyle: const TextStyle(color: Colors.purple),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          filled: true,
-          fillColor: Colors.purple[50],
+  Widget buildTicketDetailCard(String title, String value) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      elevation: 5,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: Colors.purple.withOpacity(0.5)),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 5.0,
+              offset: Offset(0, 3), // Shadow position
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.purple,
+              ),
+            ),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 18,
+                color: Colors.black54,
+              ),
+            ),
+          ],
         ),
       ),
     );

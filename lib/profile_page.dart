@@ -183,7 +183,6 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 16),
 
-            // Date of birth with calendar picker (editable in edit mode)
             GestureDetector(
               onTap: isEditMode ? () => _selectDate(context) : null,
               child: AbsorbPointer(

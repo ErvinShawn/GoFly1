@@ -1,249 +1,293 @@
-// ignore: unused_import
-
 import 'package:flutter/material.dart';
-import 'package:my_flutter_app/payment.dart';
+import 'dart:math'; // For generating random Booking ID
 
-class BookingPage extends StatelessWidget {
+class BookingPage extends StatefulWidget {
   const BookingPage({super.key});
+
+  @override
+  _BookingPageState createState() => _BookingPageState();
+}
+
+class _BookingPageState extends State<BookingPage> {
+  final Random _random = Random();
+  String _bookingId = '';
+  String? _selectedSeat;
+  String? _selectedMeal;
+  int _mealCount = 0;
+  int _ticketPrice = 5000; // Example price
+  int _mealPrice = 200; // Example meal price per item
+  final List<String> _availableSeats = [
+    '1-E',
+    '2-E',
+    '3-E',
+    '4-E',
+    '5-E',
+    '6-E',
+    '7-E',
+    '8-E',
+    '9-E',
+    '10-E',
+    '1-B',
+    '2-B',
+    '3-B',
+    '4-B',
+    '5-B',
+    '6-B',
+    '7-B',
+    '8-B',
+    '1-F',
+    '2-F',
+    '3-F',
+    '4-F',
+    '5-F'
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _bookingId = _generateBookingId();
+  }
+
+  String _generateBookingId() {
+    return 'GF${_random.nextInt(1000000).toString().padLeft(6, '0')}';
+  }
+
+  int _calculateTotalAmount() {
+    return _ticketPrice + (_mealPrice * _mealCount);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('GoFly'),
-        titleTextStyle: const TextStyle(
-            color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+        title: const Text(
+          'GoFly ',
+          style: TextStyle(fontSize: 24),
+          selectionColor: Colors.white,
+        ),
+        centerTitle: false,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
-            image: DecorationImage(
-              image:
-                  AssetImage('assets/goflybg.jpg'), // AppBar background image
-              fit: BoxFit.cover,
+            gradient: LinearGradient(
+              colors: [
+                Color.fromARGB(255, 135, 0, 176),
+                Color.fromARGB(255, 219, 0, 186)
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
           ),
         ),
-        backgroundColor:
-            Colors.transparent, // To make the background image visible
+        backgroundColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context); // Back button
+            Navigator.pop(context);
           },
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
         child: SingleChildScrollView(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  const Text(
-                    'BookingID:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: TextField(
-                      enabled: false,
-                      decoration: InputDecoration(
-                        hintText: 'Booking id',
-                        border: const OutlineInputBorder(),
-                        filled: true,
-                        fillColor: Colors.grey[200],
-                      ),
+              _buildTitle('Booking ID:'),
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                elevation: 4,
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Text(
+                    _bookingId,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black54,
                     ),
                   ),
-                ],
+                ),
               ),
               const SizedBox(height: 20),
+              _buildSectionTitle('Flight Details:'),
+              const SizedBox(height: 10),
+              _buildFlightDetailsRow('Flight Number', 'GF123'),
+              _buildFlightDetailsRow('Flight Name', 'GoFly Express'),
+              _buildFlightDetailsRow('Source', 'New York (JFK)'),
+              _buildFlightDetailsRow('Destination', 'Los Angeles (LAX)'),
+              _buildFlightDetailsRow('Departure', '10:00 AM'),
+              _buildFlightDetailsRow('Arrival', '1:00 PM'),
+              const SizedBox(height: 20),
+              _buildSectionTitle('Select Seat:'),
+              const SizedBox(height: 10),
+              _buildDropdown(_availableSeats, _selectedSeat, (value) {
+                setState(() {
+                  _selectedSeat = value;
+                });
+              }),
+              const SizedBox(height: 20),
+              _buildSectionTitle('Catering Options:'),
+              const SizedBox(height: 10),
+              _buildDropdown(
+                  ['Veg Meal', 'Non-Veg Meal', 'Vegan Meal', 'No Meal'],
+                  _selectedMeal, (value) {
+                setState(() {
+                  _selectedMeal = value;
+                });
+              }),
+              const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Source (from):',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                              color: const Color.fromARGB(255, 202, 105, 221)),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ],
+                  const Text(
+                    'Meal Quantity:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Row(
                     children: [
-                      const Text(
-                        'Destination (to):',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                              color: const Color.fromARGB(255, 205, 102, 216)),
-                          borderRadius: BorderRadius.circular(8),
+                      _buildQuantityButton(Icons.remove, () {
+                        setState(() {
+                          if (_mealCount > 0) _mealCount--;
+                        });
+                      }),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text(
+                          _mealCount.toString(),
+                          style: const TextStyle(fontSize: 16),
                         ),
                       ),
+                      _buildQuantityButton(Icons.add, () {
+                        setState(() {
+                          _mealCount++;
+                        });
+                      }),
                     ],
                   ),
                 ],
               ),
               const SizedBox(height: 20),
+              _buildTotalAmount(),
+              const SizedBox(height: 20),
               Center(
-                child: Column(
-                  children: [
-                    const Text(
-                      'Flight:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 192, 88, 211),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    const SizedBox(height: 10),
-                    const SizedBox(
-                      width: double.infinity,
-                      child: TextField(
-                        enabled: false,
-                        decoration: InputDecoration(
-                          hintText: '',
-                          border: OutlineInputBorder(),
-                          filled: true,
-                          fillColor: Color.fromARGB(255, 248, 242, 242),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'SeatNo/Class:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 10),
-                    const SizedBox(
-                      width: double.infinity,
-                      child: TextField(
-                        enabled: false,
-                        decoration: InputDecoration(
-                          hintText: '',
-                          border: OutlineInputBorder(),
-                          filled: true,
-                          fillColor: Color.fromARGB(255, 249, 247, 247),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    const Row(
-                      children: [
-                        Text(
-                          'Passengers:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(width: 10),
-                        SizedBox(
-                          width: 50,
-                          child: TextField(
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              filled: true,
-                              fillColor: Color.fromARGB(255, 247, 242, 242),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        const Text(
-                          'MealType (Optional):',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Checkbox(value: true, onChanged: (val) {}),
-                        const Text('Veg'),
-                        Checkbox(value: true, onChanged: (val) {}),
-                        const Text('Non-Veg'),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        const Text(
-                          'Meal-qty(if any):',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Container(
-                            child: const TextField(
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                filled: true,
-                                fillColor: Color.fromARGB(255, 248, 248, 248),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        ElevatedButton(
-                          onPressed: () {},
-                          child: const Icon(Icons.add),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Total Amount:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const SizedBox(
-                      width: double.infinity,
-                      child: TextField(
-                        enabled: false,
-                        decoration: InputDecoration(
-                          hintText: 'AMOUNT PAYABLE',
-                          border: OutlineInputBorder(),
-                          filled: true,
-                          fillColor: Color.fromARGB(255, 248, 246, 246),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            const Color.fromARGB(255, 192, 88, 211),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 100, vertical: 15),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const PaymentPage()),
-                        );
-                      },
-                      child: const Text('Proceed to Pay',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
-                    ),
-                  ],
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 80, vertical: 15),
+                  ),
+                  onPressed: () {
+                    // Navigate to the Payment Page
+                  },
+                  child: const Text(
+                    'Proceed to Pay',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFlightDetailsRow(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            '$title:',
+            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+          ),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 18,
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+          fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
+    );
+  }
+
+  Widget _buildDropdown(List<String> items, String? selectedItem,
+      ValueChanged<String?> onChanged) {
+    return DropdownButtonFormField<String>(
+      value: selectedItem,
+      items: items
+          .map((item) => DropdownMenuItem(
+                value: item,
+                child: Text(item),
+              ))
+          .toList(),
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        filled: true,
+        fillColor: Colors.grey[200],
+      ),
+    );
+  }
+
+  Widget _buildQuantityButton(IconData icon, VoidCallback onPressed) {
+    return IconButton(
+      icon: Icon(icon),
+      onPressed: onPressed,
+      color: const Color.fromARGB(227, 199, 17, 166),
+    );
+  }
+
+  Widget _buildTotalAmount() {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      elevation: 3,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Total Amount:',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: Colors.black87),
+            ),
+            Text(
+              '₹${_calculateTotalAmount()}',
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold, fontSize: 18, color: Colors.red),
+            ),
+          ],
         ),
       ),
     );
