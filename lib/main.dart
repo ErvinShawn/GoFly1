@@ -4,6 +4,7 @@ import 'package:my_flutter_app/main_page.dart';
 import 'package:my_flutter_app/profile_page.dart';
 import 'package:my_flutter_app/search_page.dart';
 import 'package:my_flutter_app/signin.dart';
+
 import 'package:my_flutter_app/signup.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
