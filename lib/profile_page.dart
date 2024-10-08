@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // For formatting dates
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -14,9 +15,10 @@ class _ProfilePageState extends State<ProfilePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   User? currentUser;
-  String name = '', email = '', phone = '', dob = '', location = '';
+  String name = '', email = '', phone = '', dob = '', address = '', age = '';
 
   bool isEditMode = false; // Track whether the user is in edit mode
+  DateTime? selectedDate; // For storing selected date of birth
 
   // Fetch current user details on initialization
   @override
@@ -25,7 +27,6 @@ class _ProfilePageState extends State<ProfilePage> {
     currentUser = _auth.currentUser;
     if (currentUser != null) {
       setState(() {
-        name = currentUser!.displayName ?? '';
         email = currentUser!.email ?? '';
       });
       // Load additional profile details from Firestore if available
@@ -36,13 +37,18 @@ class _ProfilePageState extends State<ProfilePage> {
   // Load the additional profile data from Firestore
   Future<void> _loadProfileData() async {
     try {
-      DocumentSnapshot doc =
-          await _firestore.collection('users').doc(currentUser!.uid).get();
+      DocumentSnapshot doc = await _firestore
+          .collection('users')
+          .doc(currentUser!.email)
+          .get(); // Use email as document ID
       if (doc.exists) {
         setState(() {
-          phone = doc['phone'] ?? '';
+          name = doc['name'] ?? '';
+          phone = doc['PhNum'] ?? '';
           dob = doc['dob'] ?? '';
-          location = doc['location'] ?? '';
+          selectedDate = dob.isNotEmpty ? DateTime.parse(dob) : null;
+          address = doc['address'] ?? '';
+          age = doc['age']?.toString() ?? ''; // Make sure it's a string
         });
       }
     } catch (e) {
@@ -53,12 +59,13 @@ class _ProfilePageState extends State<ProfilePage> {
   // Save the profile data to Firestore
   Future<void> _saveProfileData() async {
     try {
-      await _firestore.collection('users').doc(currentUser!.uid).set({
+      await _firestore.collection('users').doc(currentUser!.email).set({
         'name': name,
-        'email': email,
-        'phone': phone,
+        'PhNum': phone,
         'dob': dob,
-        'location': location,
+        'address': address,
+        'age': int.tryParse(age), // Save age as an integer
+        'email': email,
       }, SetOptions(merge: true));
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -75,11 +82,44 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // Function to show the date picker
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate ?? DateTime.now(),
+      firstDate: DateTime(1900), // Adjust as necessary
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+        dob = DateFormat('yyyy-MM-dd').format(picked); // Format the DOB
+        _calculateAge(picked); // Calculate age based on selected date
+      });
+    }
+  }
+
+  // Function to calculate age from the date of birth
+  void _calculateAge(DateTime dob) {
+    DateTime today = DateTime.now();
+    int ageCalc = today.year - dob.year;
+
+    // Check if the user hasn't had their birthday this year
+    if (today.month < dob.month ||
+        (today.month == dob.month && today.day < dob.day)) {
+      ageCalc--;
+    }
+
+    setState(() {
+      age = ageCalc.toString(); // Update the age field
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('GoFly'),
+        title: const Text('Profile Page'),
         titleTextStyle: const TextStyle(
             color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
         flexibleSpace: Container(
@@ -104,14 +144,17 @@ class _ProfilePageState extends State<ProfilePage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Display name (non-editable)
+            // Display name (editable in edit mode)
             TextField(
               decoration: const InputDecoration(
                 labelText: 'Name',
                 border: OutlineInputBorder(),
               ),
               controller: TextEditingController(text: name),
-              enabled: false, // Non-editable
+              enabled: isEditMode,
+              onChanged: (value) {
+                name = value;
+              },
             ),
             const SizedBox(height: 16),
 
@@ -140,31 +183,44 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 16),
 
-            // Date of birth (editable in edit mode)
+            // Date of birth with calendar picker (editable in edit mode)
+            GestureDetector(
+              onTap: isEditMode ? () => _selectDate(context) : null,
+              child: AbsorbPointer(
+                child: TextField(
+                  decoration: const InputDecoration(
+                    labelText: 'Date of Birth',
+                    border: OutlineInputBorder(),
+                  ),
+                  controller: TextEditingController(text: dob),
+                  enabled: isEditMode, // Editable only in edit mode
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Address (editable in edit mode)
             TextField(
               decoration: const InputDecoration(
-                labelText: 'Date of Birth',
+                labelText: 'Address',
                 border: OutlineInputBorder(),
               ),
-              controller: TextEditingController(text: dob),
+              controller: TextEditingController(text: address),
               enabled: isEditMode, // Editable only in edit mode
               onChanged: (value) {
-                dob = value;
+                address = value;
               },
             ),
             const SizedBox(height: 16),
 
-            // Location (editable in edit mode)
+            // Age (non-editable, calculated automatically)
             TextField(
               decoration: const InputDecoration(
-                labelText: 'Location',
+                labelText: 'Age',
                 border: OutlineInputBorder(),
               ),
-              controller: TextEditingController(text: location),
-              enabled: isEditMode, // Editable only in edit mode
-              onChanged: (value) {
-                location = value;
-              },
+              controller: TextEditingController(text: age),
+              enabled: false, // Age is non-editable
             ),
             const SizedBox(height: 16),
 
