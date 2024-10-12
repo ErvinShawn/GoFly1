@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:upi_india/upi_india.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key});
@@ -9,42 +9,67 @@ class PaymentPage extends StatefulWidget {
 }
 
 class _PaymentPageState extends State<PaymentPage> {
-  UpiIndia _upiIndia = UpiIndia();
-  UpiResponse? _transaction;
+  late Razorpay _razorpay;
+  String _transaction = '';
 
-  String bookingId = '1000';
-  String userId = '100';
-  double amount = 1.00; // Default payment amount
-
-  Future<void> initiateTransaction() async {
-    UpiResponse response = await _upiIndia.startTransaction(
-      app: UpiApp.googlePay, // Specify Google Pay as the UPI app
-      receiverUpiId: 'ervindacosta17@oksbi', // Example UPI ID (replace with real one)
-      receiverName: 'Ervin Da Costa', // Example merchant name
-      transactionRefId: 'TID123456789', // Example transaction reference ID
-      transactionNote: 'Payment for booking', // Description of payment
-      amount: amount, // Amount to be paid
-    );
-
-    setState(() {
-      _transaction = response;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
 
-  Widget displayTransactionStatus() {
-    if (_transaction == null) {
-      return const Text("Transaction Status: Not Initiated");
-    }
-    switch (_transaction!.status) {
-      case UpiPaymentStatus.SUCCESS:
-        return const Text("Transaction Status: Success");
-      case UpiPaymentStatus.FAILURE:
-        return const Text("Transaction Status: Failure");
-      case UpiPaymentStatus.SUBMITTED:
-        return const Text("Transaction Status: Submitted");
-      default:
-        return const Text("Transaction Status: Unknown");
-    }
+  @override
+  void dispose() {
+    super.dispose();
+    _razorpay.clear(); // Removing listeners on dispose
+  }
+
+  // Open Razorpay checkout
+  void openCheckout() {
+    var options = {
+      'key': 'YOUR_RAZORPAY_API_KEY', // Replace with your Razorpay key
+      'amount': 100, // Amount in paise (50000 paise = ₹500)
+      'name': 'GoFly',
+      'description': 'Flight Booking Payment',
+      'prefill': {
+        'contact': '1234567890',
+        'email': 'test@razorpay.com',
+      },
+      'external': {
+        'wallets': ['paytm']
+      }
+    };
+
+    
+      _razorpay.open(options);
+    
+  }
+
+  // Payment Success handler
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    setState(() {
+      _transaction = 'Payment Successful: ${response.paymentId}';
+    });
+    //print('Payment Successful: ${response.paymentId}');
+  }
+
+  // Payment Error handler
+  void _handlePaymentError(PaymentFailureResponse response) {
+    setState(() {
+      _transaction = 'Payment Failed: ${response.code} - ${response.message}';
+    });
+    //print('Payment Failed: ${response.code} - ${response.message}');
+  }
+
+  // External Wallet handler
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    setState(() {
+      _transaction = 'External Wallet Selected: ${response.walletName}';
+    });
+    //print('External Wallet Selected: ${response.walletName}');
   }
 
   @override
@@ -78,52 +103,29 @@ class _PaymentPageState extends State<PaymentPage> {
                     fontSize: 30),
               ),
             ),
-            const SizedBox(height: 20),
-            buildTextFieldRow('BookingID:', bookingId),
-            const SizedBox(height: 10),
-            buildTextFieldRow('  User  ID:  ', userId),
-            const SizedBox(height: 10),
-            buildTextFieldRow('   Amount:  ', '₹$amount'),
-            const SizedBox(height: 20),
             buildPaymentContainer(context),
             const SizedBox(height: 20),
             const Center(
               child: Text(
-                "please click on the 'Confirm' button to initiate the transaction",
+                "Please click on the 'Confirm' button to initiate the transaction",
                 style: TextStyle(color: Colors.pink),
               ),
             ),
             const SizedBox(height: 20),
-            displayTransactionStatus(),
             const Spacer(),
             buildConfirmButton(context),
+            const SizedBox(height: 20),
+            if (_transaction.isNotEmpty)
+              Text(
+                _transaction,
+                style: const TextStyle(
+                    color: Colors.green, fontWeight: FontWeight.bold),
+              ),
           ],
         ),
       ),
     );
   }
-
-  Widget buildTextFieldRow(String label, String value) {
-    return Row(
-      children: [
-        Text(label,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        const SizedBox(width: 10),
-        Expanded(
-          child: TextField(
-            readOnly: true,
-            decoration: InputDecoration(
-              hintText: value,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
 
   Widget buildPaymentContainer(BuildContext context) {
     return Container(
@@ -182,36 +184,15 @@ class _PaymentPageState extends State<PaymentPage> {
                   color: Colors.white),
             ),
           ),
-          const SizedBox(height: 10),
-          /*TextButton(
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const QRCodePage()));
-            },
-            style: TextButton.styleFrom(
-              backgroundColor: Colors.grey[500],
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-            ),
-            child: const Text(
-              'Click here for QR',
-              style: TextStyle(color: Colors.white, fontSize: 16),
-            ),
-          ),*/
         ],
       ),
     );
   }
 
-  
-
-
   Widget buildConfirmButton(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        initiateTransaction(); // Initiating UPI transaction on Confirm button click
+        openCheckout(); // Initiate transaction on Confirm button click
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 30),
