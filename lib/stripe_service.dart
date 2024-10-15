@@ -1,15 +1,21 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'consts.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'bookingdetails.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StripeService {
   StripeService._();
 
   static final StripeService instance = StripeService._();
 
-  Future<void> makePayment() async {
+  Future<void> makePayment(
+      int totalamount, String bookingId, BuildContext context) async {
+    String paymentId = _generatePaymentId();
     try {
-      String? paymentIntentClientSecret = await _createPaymentIntent(10, "inr");
+      String? paymentIntentClientSecret =
+          await _createPaymentIntent(totalamount, "inr");
       if (paymentIntentClientSecret == null) return;
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
@@ -17,8 +23,11 @@ class StripeService {
             merchantDisplayName: "GoFly"),
       );
       await _processPayment();
+      await _savePaymentDetails(paymentId, totalamount, 'done', bookingId);
+      _showSuccessMessage(context);
     } catch (e) {
       print("Error during payment: $e");
+      await _savePaymentDetails(paymentId, totalamount, 'Cancelled', bookingId);
     }
   }
 
@@ -56,9 +65,32 @@ class StripeService {
     return null;
   }
 
+  String _generatePaymentId() {
+    final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+    return 'PAY${timestamp}';
+  }
+
+  Future<void> _savePaymentDetails(
+      String paymentId, int amount, String status, String bookingId) async {
+    try {
+      await FirebaseFirestore.instance.collection('Payments').add({
+        'paymentId': paymentId,
+        'amount': amount,
+        'status': status,
+        'timestamp': Timestamp.now(),
+        'bookingId': bookingId,
+      });
+      print('Payment details saved successfully.');
+    } catch (e) {
+      print('Error saving payment details: $e');
+    }
+  }
+
   Future<void> _processPayment() async {
     try {
       await Stripe.instance.presentPaymentSheet();
+      String a = await Stripe.instance.confirmPaymentSheetPayment().toString();
+      print(a);
     } catch (e) {
       print(e);
     }
@@ -67,5 +99,15 @@ class StripeService {
   String _calculateAmount(int amount) {
     final calculatedAmount = amount * 100; // Convert to cents
     return calculatedAmount.toString();
+  }
+
+  void _showSuccessMessage(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Payment sucessful! Redirecting to home..'),
+        duration: Duration(seconds: 3)));
+
+    Future.delayed(Duration(seconds: 3), () {
+      Navigator.pushReplacementNamed(context, '/main');
+    });
   }
 }

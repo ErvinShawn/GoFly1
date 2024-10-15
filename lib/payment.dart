@@ -61,7 +61,7 @@ class PaymentPage extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            buildConfirmButton(context),
+            buildConfirmButton(context, totalAmount, bookingId),
           ],
         ),
       ),
@@ -141,10 +141,10 @@ Widget buildCardPaymentOption() {
   );
 }
 
-Widget buildConfirmButton(BuildContext context) {
+Widget buildConfirmButton(BuildContext context, int amount, String bookingId) {
   return GestureDetector(
     onTap: () async {
-      StripeService.instance.makePayment();
+      StripeService.instance.makePayment(amount, bookingId, context);
     },
     child: Container(
       padding: const EdgeInsets.symmetric(vertical: 20),

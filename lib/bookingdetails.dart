@@ -93,8 +93,7 @@ class _BookingPageState extends State<BookingPage> {
     try {
       await FirebaseFirestore.instance.collection('Booking').add({
         'bookingId': _bookingId,
-        'flightNumber':
-            'flight123', // Replace with the actual flight number if needed
+        'flightNumber': 'flight123',
         'flightName': widget.flightName,
         'source': widget.source,
         'destination': widget.destination,
