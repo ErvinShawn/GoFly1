@@ -62,8 +62,10 @@ class Dropdown extends StatelessWidget {
           CustomImageButton(
             'Ticket Details',
             () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const TicketDetailsPage()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const TicketDetailsPage()));
             },
             'assets/goflybg.jpg',
           ),
@@ -134,8 +136,8 @@ class FlightStatusPage extends StatelessWidget {
             ),
           ),
         ),
-        backgroundColor:
-            Colors.transparent, // To make the background image visible
+        backgroundColor: const Color.fromARGB(
+            213, 187, 17, 165), // To make the background image visible
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -152,7 +154,7 @@ class FlightStatusPage extends StatelessWidget {
             const Text(
               'Flight Status',
               style: TextStyle(
-                  color: Colors.purple,
+                  color: Color(0xFF9C27B0),
                   fontSize: 24,
                   fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
@@ -219,7 +221,7 @@ class TicketDetailsPage extends StatelessWidget {
             ),
           ),
           backgroundColor:
-              Colors.transparent, // To make the background image visible
+              const Color(0xFF9C27B0), // To make the background image visible
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
@@ -317,7 +319,7 @@ class AboutUsPage extends StatelessWidget {
         titleTextStyle: const TextStyle(
             color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             image: DecorationImage(
               image:
                   AssetImage('assets/goflybg.jpg'), // AppBar background image
@@ -326,7 +328,7 @@ class AboutUsPage extends StatelessWidget {
           ),
         ),
         backgroundColor:
-            Colors.transparent, // To make the background image visible
+            const Color(0xFF9C27B0), // To make the background image visible
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
