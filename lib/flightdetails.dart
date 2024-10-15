@@ -88,7 +88,17 @@ class FlightDetailsPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const BookingPage()),
+                      builder: (context) => BookingPage(
+                        flightName: flightName,
+                        source: source,
+                        destination: destination,
+                        arrivalTime: arrivalTime,
+                        departureTime: departureTime,
+                        economyPrice: economyPrice,
+                        businessPrice: businessPrice,
+                        firstClassPrice: firstClassPrice,
+                      ),
+                    ),
                   );
                 },
                 style: ElevatedButton.styleFrom(

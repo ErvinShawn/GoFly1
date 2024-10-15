@@ -232,18 +232,21 @@ class _AdminPageState extends State<AdminPage> {
             TextField(
               controller: _pricesEconomyController,
               decoration: const InputDecoration(labelText: 'Prices (Economy)'),
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
             ),
             TextField(
               controller: _pricesBusinessController,
               decoration: const InputDecoration(labelText: 'Prices (Business)'),
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
             ),
             TextField(
               controller: _pricesFirstClassController,
               decoration:
                   const InputDecoration(labelText: 'Prices (First Class)'),
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
             ),
             TextField(
               controller: _sourceController,

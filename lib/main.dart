@@ -8,13 +8,16 @@ import 'package:my_flutter_app/admin.dart';
 import 'package:my_flutter_app/signup.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  Stripe.publishableKey =
+      'pk_test_51QAAqBP9jBK9DCsa1WJGOB7Mgtlm5nq8dfEdAMRA19VDvIXoaKwiR4FyF4XOns3sEIpHNO8fEEIzP7WBYzQf3yQG00pOUIXSl0';
+
   runApp(const GoFlyApp());
 }
 

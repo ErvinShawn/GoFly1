@@ -1,8 +1,29 @@
 import 'package:flutter/material.dart';
 import 'dart:math'; // For generating random Booking ID
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'payment.dart';
 
 class BookingPage extends StatefulWidget {
-  const BookingPage({super.key});
+  final String flightName;
+  final String source;
+  final String destination;
+  final String arrivalTime;
+  final String departureTime;
+  final int economyPrice;
+  final int businessPrice;
+  final int firstClassPrice;
+
+  const BookingPage({
+    super.key,
+    required this.flightName,
+    required this.source,
+    required this.destination,
+    required this.arrivalTime,
+    required this.departureTime,
+    required this.economyPrice,
+    required this.businessPrice,
+    required this.firstClassPrice,
+  });
 
   @override
   _BookingPageState createState() => _BookingPageState();
@@ -14,46 +35,86 @@ class _BookingPageState extends State<BookingPage> {
   String? _selectedSeat;
   String? _selectedMeal;
   int _mealCount = 0;
-  int _ticketPrice = 5000; // Example price
-  int _mealPrice = 200; // Example meal price per item
-  final List<String> _availableSeats = [
-    '1-E',
-    '2-E',
-    '3-E',
-    '4-E',
-    '5-E',
-    '6-E',
-    '7-E',
-    '8-E',
-    '9-E',
-    '10-E',
-    '1-B',
-    '2-B',
-    '3-B',
-    '4-B',
-    '5-B',
-    '6-B',
-    '7-B',
-    '8-B',
-    '1-F',
-    '2-F',
-    '3-F',
-    '4-F',
-    '5-F'
-  ];
+  int _ticketPrice = 0;
+  int _mealPrice = 0;
+  String? _selectedClass = 'Economy';
+  final List<String> _availableSeats = ['1', '2', '3', '4', '5'];
 
   @override
   void initState() {
     super.initState();
     _bookingId = _generateBookingId();
+    //default price
+    _ticketPrice = widget.economyPrice;
   }
 
   String _generateBookingId() {
     return 'GF${_random.nextInt(1000000).toString().padLeft(6, '0')}';
   }
 
+  int _calculateMealPrice() {
+    switch (_selectedMeal) {
+      case 'Non-Veg Meal':
+        _mealPrice = 300;
+        break;
+      case 'Veg Meal':
+        _mealPrice = 200;
+        break;
+      case 'Vegan Meal':
+        _mealPrice = 150;
+        break;
+      default:
+        _mealPrice = 0;
+    }
+    return _mealPrice * _mealCount;
+  }
+
+  void _updateTicketPrice(String? selectedClass) {
+    setState(() {
+      switch (selectedClass) {
+        case 'Business':
+          _ticketPrice = widget.businessPrice;
+          break;
+        case 'First Class':
+          _ticketPrice = widget.firstClassPrice;
+          break;
+        case 'Economy':
+        default:
+          _ticketPrice = widget.economyPrice;
+      }
+    });
+  }
+
   int _calculateTotalAmount() {
-    return _ticketPrice + (_mealPrice * _mealCount);
+    return _ticketPrice + _calculateMealPrice();
+  }
+
+  Future<void> _saveBooking() async {
+    try {
+      await FirebaseFirestore.instance.collection('Booking').add({
+        'bookingId': _bookingId,
+        'flightNumber':
+            'flight123', // Replace with the actual flight number if needed
+        'flightName': widget.flightName,
+        'source': widget.source,
+        'destination': widget.destination,
+        'departure': widget.departureTime,
+        'arrival': widget.arrivalTime,
+        'seat': _selectedSeat,
+        'meal': _selectedMeal,
+        'mealCount': _mealCount,
+        'totalAmount': _calculateTotalAmount(),
+        'bookingDate': Timestamp.now(),
+      });
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Booking saved successfully!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error saving booking: $e')),
+      );
+    }
   }
 
   @override
@@ -63,7 +124,6 @@ class _BookingPageState extends State<BookingPage> {
         title: const Text(
           'GoFly ',
           style: TextStyle(fontSize: 24),
-          selectionColor: Colors.white,
         ),
         centerTitle: false,
         flexibleSpace: Container(
@@ -110,33 +170,45 @@ class _BookingPageState extends State<BookingPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               _buildSectionTitle('Flight Details:'),
-              const SizedBox(height: 10),
-              _buildFlightDetailsRow('Flight Number', 'GF123'),
-              _buildFlightDetailsRow('Flight Name', 'GoFly Express'),
-              _buildFlightDetailsRow('Source', 'New York (JFK)'),
-              _buildFlightDetailsRow('Destination', 'Los Angeles (LAX)'),
-              _buildFlightDetailsRow('Departure', '10:00 AM'),
-              _buildFlightDetailsRow('Arrival', '1:00 PM'),
+              const SizedBox(height: 1),
+              _buildFlightDetailsRow('Flight Name', widget.flightName),
+              _buildFlightDetailsRow('Source', widget.source),
+              _buildFlightDetailsRow('Destination', widget.destination),
+              _buildFlightDetailsRow('Departure', widget.departureTime),
+              _buildFlightDetailsRow('Arrival', widget.arrivalTime),
               const SizedBox(height: 20),
+              _buildSectionTitle('Select Seat Class: '),
+              const SizedBox(height: 1),
+              _buildDropdown(
+                  ['Economy', 'First Class', 'Business'], _selectedClass,
+                  (value) {
+                setState(() {
+                  _selectedClass = value;
+                  _updateTicketPrice(value);
+                });
+              }),
+              const SizedBox(height: 1),
               _buildSectionTitle('Select Seat:'),
-              const SizedBox(height: 10),
+              const SizedBox(height: 1),
               _buildDropdown(_availableSeats, _selectedSeat, (value) {
                 setState(() {
                   _selectedSeat = value;
                 });
               }),
-              const SizedBox(height: 20),
+              const SizedBox(height: 1),
               _buildSectionTitle('Catering Options:'),
-              const SizedBox(height: 10),
+              const SizedBox(height: 1),
               _buildDropdown(
-                  ['Veg Meal', 'Non-Veg Meal', 'Vegan Meal', 'No Meal'],
-                  _selectedMeal, (value) {
-                setState(() {
-                  _selectedMeal = value;
-                });
-              }),
+                ['Veg Meal', 'Non-Veg Meal', 'Vegan Meal', 'No Meal'],
+                _selectedMeal,
+                (value) {
+                  setState(() {
+                    _selectedMeal = value;
+                  });
+                },
+              ),
               const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -182,10 +254,20 @@ class _BookingPageState extends State<BookingPage> {
                         horizontal: 80, vertical: 15),
                   ),
                   onPressed: () {
-                    // Navigate to the Payment Page
+                    _saveBooking(); // Save the booking first
+                    // Navigate to the Payment Page with required details
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PaymentPage(
+                          bookingId: _bookingId,
+                          totalAmount: _calculateTotalAmount(),
+                        ),
+                      ),
+                    );
                   },
                   child: const Text(
-                    'Proceed to Pay',
+                    'PROCEED TO PAY',
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white),
                   ),
@@ -217,27 +299,14 @@ class _BookingPageState extends State<BookingPage> {
     );
   }
 
-  Widget _buildTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 18,
-      ),
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-          fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
-    );
-  }
-
   Widget _buildDropdown(List<String> items, String? selectedItem,
-      ValueChanged<String?> onChanged) {
+      void Function(String?) onChanged) {
     return DropdownButtonFormField<String>(
+      decoration: InputDecoration(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
       value: selectedItem,
       items: items
           .map((item) => DropdownMenuItem(
@@ -246,48 +315,53 @@ class _BookingPageState extends State<BookingPage> {
               ))
           .toList(),
       onChanged: onChanged,
-      decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        filled: true,
-        fillColor: Colors.grey[200],
-      ),
     );
   }
 
-  Widget _buildQuantityButton(IconData icon, VoidCallback onPressed) {
+  Widget _buildQuantityButton(IconData icon, void Function() onPressed) {
     return IconButton(
       icon: Icon(icon),
       onPressed: onPressed,
-      color: const Color.fromARGB(227, 199, 17, 166),
     );
   }
 
   Widget _buildTotalAmount() {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Text(
+          'Total Amount:',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        Text(
+          '₹${_calculateTotalAmount()}',
+          style: const TextStyle(fontSize: 18),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
       ),
-      elevation: 3,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Total Amount:',
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: Colors.black87),
-            ),
-            Text(
-              '₹${_calculateTotalAmount()}',
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold, fontSize: 18, color: Colors.red),
-            ),
-          ],
+    );
+  }
+
+  Widget _buildTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
