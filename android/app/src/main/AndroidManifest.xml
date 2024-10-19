@@ -5,7 +5,7 @@
     <application
         android:label="GoFly"
         android:name="${applicationName}"
-        android:icon="@mipmap/launcher_icon"
+        android:icon="@mipmap/ic_launcher"
         android:theme="@style/Theme.MaterialComponents">
         <activity
             android:name=".MainActivity"

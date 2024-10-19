@@ -10,7 +10,7 @@ class ResultPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("Number of flights: ${flights.length}"); // Debugging line
+    print("Number of flights: ${flights.length}"); 
     return Scaffold(
       appBar: AppBar(
         title: const Text('GoFly'),
@@ -48,7 +48,7 @@ class ResultPage extends StatelessWidget {
           Expanded(
             child: flights.isEmpty
                 ? const Center(
-                    child: Text('No flights found.')) // Display if no results
+                    child: Text('No flights found.')) 
                 : ListView.builder(
                     padding: const EdgeInsets.all(16),
                     itemCount: flights.length,
@@ -61,7 +61,7 @@ class ResultPage extends StatelessWidget {
                       String destination =
                           flight['destination'] ?? 'Unknown Destination';
 
-                      // Get the arrival time from Firestore and format it
+                      
                       Timestamp arrivalTimestamp = flight['arrival_time'];
                       String arrivalTime = arrivalTimestamp != null
                           ? DateFormat('yyyy-MM-dd – kk:mm')
@@ -135,7 +135,7 @@ class ResultPage extends StatelessWidget {
       int firstClassSeatCount) {
     return GestureDetector(
       onTap: () {
-        // Navigate to FlightDetailsPage with all the required details
+       
         Navigator.push(
           context,
           MaterialPageRoute(
