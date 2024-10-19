@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:my_flutter_app/main_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart'; // For date formatting and parsing
 
 class Dropdown extends StatelessWidget {
   const Dropdown({super.key});
@@ -201,65 +204,123 @@ class FlightStatusPage extends StatelessWidget {
   }
 }
 
-class TicketDetailsPage extends StatelessWidget {
+class TicketDetailsPage extends StatefulWidget {
   const TicketDetailsPage({super.key});
+
+  @override
+  _TicketDetailsPageState createState() => _TicketDetailsPageState();
+}
+
+class _TicketDetailsPageState extends State<TicketDetailsPage> {
+  String? _userEmail;
+  List<Map<String, dynamic>> _bookings = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserEmail();
+  }
+
+  // Get the current user's email
+  Future<void> _getUserEmail() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        _userEmail = user.email;
+      });
+      _fetchBookings(); // Fetch bookings after getting the email
+    }
+  }
+
+  // Fetch the upcoming bookings from Firestore for the current user
+  Future<void> _fetchBookings() async {
+    if (_userEmail == null) return;
+
+    try {
+      // Query Firestore for bookings with the user's email and filter upcoming ones
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('Booking')
+          .where('email', isEqualTo: _userEmail)
+          .get();
+
+      List<Map<String, dynamic>> upcomingBookings = [];
+      DateTime now = DateTime.now();
+
+      for (var doc in snapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        // Parse the departure date and time
+        DateTime departureDate = _parseDate(data['departure']);
+        
+        // Check if the booking's departure is after the current time (upcoming)
+        if (departureDate.isAfter(now)) {
+          upcomingBookings.add(data);
+        }
+      }
+
+      setState(() {
+        _bookings = upcomingBookings;
+      });
+    } catch (e) {
+      print('Error fetching bookings: $e');
+    }
+  }
+
+  // Helper method to parse departure time
+  DateTime _parseDate(String dateTimeStr) {
+    // Assuming the format is "2024-10-31 – 24:00", we'll extract the date and parse it
+    String formattedStr = dateTimeStr.split(" – ")[0];
+    return DateTime.parse(formattedStr);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('GoFly'),
-          titleTextStyle: const TextStyle(
-              color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
-          flexibleSpace: Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image:
-                    AssetImage('assets/goflybg.jpg'), // AppBar background image
-                fit: BoxFit.cover,
-              ),
+      appBar: AppBar(
+        title: const Text('GoFly'),
+        titleTextStyle: const TextStyle(
+            color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/goflybg.jpg'),
+              fit: BoxFit.cover,
             ),
-          ),
-          backgroundColor:
-              const Color(0xFF9C27B0), // To make the background image visible
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context); // Back button
-            },
           ),
         ),
-        body: ListView(
-          padding: const EdgeInsets.all(20),
-          children: const [
-            Text(
-              'Ticket Details',
-              style: TextStyle(
-                  color: Colors.purple,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
+        backgroundColor: const Color(0xFF9C27B0),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      body: _bookings.isEmpty
+          ? const Center(child: Text('No upcoming bookings.'))
+          : ListView.builder(
+              padding: const EdgeInsets.all(20),
+              itemCount: _bookings.length,
+              itemBuilder: (context, index) {
+                final booking = _bookings[index];
+                return TicketCard(booking: booking);
+              },
             ),
-            TicketCard(),
-            TicketCard(),
-            TicketCard(),
-          ],
-        )
-        // Footer Navigation Bar
-
-        );
+    );
   }
 }
 
-// Ticket Card Widget with background image
+// Ticket Card Widget to display individual booking details
 class TicketCard extends StatelessWidget {
-  const TicketCard({super.key});
+  final Map<String, dynamic> booking;
+
+  const TicketCard({required this.booking, super.key});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      margin: const EdgeInsets.symmetric(vertical: 10),
+      margin: const EdgeInsets.symmetric(vertical: 20),
       child: SizedBox(
         height: 150,
         child: Stack(
@@ -274,7 +335,7 @@ class TicketCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(30),
               child: Row(
                 children: [
                   Container(
@@ -285,16 +346,36 @@ class TicketCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  const SizedBox(width: 20),
-                  // Text inside the  card
-                  const Expanded(
+                  const SizedBox(width: 30),
+                  // Displaying booking details
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Flight Number: 12345',
-                            style: TextStyle(color: Colors.white)),
-                        Text('Destination: XYZ',
-                            style: TextStyle(color: Colors.white)),
+                        Text(
+                          'Flight: ${booking['flightName']}',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          'From: ${booking['source']} To: ${booking['destination']}',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          'Departure: ${booking['departure']}',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          'Seat: ${booking['seat']}',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          'Meal: ${booking['meal']} (x${booking['mealCount']})',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          'Total: ₹${booking['totalAmount']}',
+                          style: const TextStyle(color: Colors.white),
+                        ),
                       ],
                     ),
                   ),
@@ -307,6 +388,7 @@ class TicketCard extends StatelessWidget {
     );
   }
 }
+
 
 class AboutUsPage extends StatelessWidget {
   const AboutUsPage({super.key});

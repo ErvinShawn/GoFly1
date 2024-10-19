@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math'; // For generating random Booking ID
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'payment.dart';
 
 class BookingPage extends StatefulWidget {
@@ -32,6 +33,7 @@ class BookingPage extends StatefulWidget {
 class _BookingPageState extends State<BookingPage> {
   final Random _random = Random();
   String _bookingId = '';
+  String? _userEmail;
   String? _selectedSeat;
   String? _selectedMeal;
   int _mealCount = 0;
@@ -40,16 +42,24 @@ class _BookingPageState extends State<BookingPage> {
   String? _selectedClass = 'Economy';
   final List<String> _availableSeats = ['1', '2', '3', '4', '5'];
 
-  @override
+    @override
   void initState() {
     super.initState();
     _bookingId = _generateBookingId();
-    //default price
+    _getUserEmail();  // Fetch the user email when the page loads
+    // Default ticket price
     _ticketPrice = widget.economyPrice;
   }
 
   String _generateBookingId() {
     return 'GF${_random.nextInt(1000000).toString().padLeft(6, '0')}';
+  }
+
+  Future<void> _getUserEmail() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    setState(() {
+      _userEmail = user?.email;
+    });
   }
 
   int _calculateMealPrice() {
@@ -90,10 +100,17 @@ class _BookingPageState extends State<BookingPage> {
   }
 
   Future<void> _saveBooking() async {
+
+    if (_userEmail == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User not signed in. Please log in.')),
+      );
+      return;
+    }
+
     try {
       await FirebaseFirestore.instance.collection('Booking').add({
-        'bookingId': _bookingId,
-        'flightNumber': 'flight123',
+        'email': _userEmail,
         'flightName': widget.flightName,
         'source': widget.source,
         'destination': widget.destination,
@@ -105,7 +122,6 @@ class _BookingPageState extends State<BookingPage> {
         'totalAmount': _calculateTotalAmount(),
         'bookingDate': Timestamp.now(),
       });
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Booking saved successfully!')),
       );

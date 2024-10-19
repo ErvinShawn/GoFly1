@@ -23,8 +23,8 @@ class _AdminPageState extends State<AdminPage> {
       TextEditingController();
   final TextEditingController statusController = TextEditingController();
 
-  DateTime? departureDateTime;
-  DateTime? arrivalDateTime;
+  DateTime? departureDate;
+  DateTime? arrivalDate;
 
   @override
   Widget build(BuildContext context) {
@@ -42,16 +42,16 @@ class _AdminPageState extends State<AdminPage> {
             buildTextField('Flight number', flightNumberController),
             buildTextField('Source', sourceController),
             buildTextField('Destination', destinationController),
-            buildDateTimePicker('Select Departure Time', (selectedDateTime) {
+            buildDatePicker('Select Departure Date', (selectedDate) {
               setState(() {
-                departureDateTime = selectedDateTime;
+                departureDate = selectedDate;
               });
-            }, departureDateTime),
-            buildDateTimePicker('Select Arrival Time', (selectedDateTime) {
+            }, departureDate),
+            buildDatePicker('Select Arrival Date', (selectedDate) {
               setState(() {
-                arrivalDateTime = selectedDateTime;
+                arrivalDate = selectedDate;
               });
-            }, arrivalDateTime),
+            }, arrivalDate),
             buildTextField('Duration', durationController),
             buildTextField('Economy price', economyPriceController),
             buildTextField('No of seats (Economy)', seatsEconomyController),
@@ -68,8 +68,7 @@ class _AdminPageState extends State<AdminPage> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.purple,
-                minimumSize: Size(
-                    200, 50), // Match the button dimensions from the design
+                minimumSize: Size(200, 50),
               ),
               child: Text('Save'),
             ),
@@ -80,10 +79,10 @@ class _AdminPageState extends State<AdminPage> {
   }
 
   Future<void> saveFlightDetails(BuildContext context) async {
-    if (departureDateTime == null || arrivalDateTime == null) {
+    if (departureDate == null || arrivalDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Please select both departure and arrival times')),
+            content: Text('Please select both departure and arrival dates')),
       );
       return;
     }
@@ -98,19 +97,19 @@ class _AdminPageState extends State<AdminPage> {
         'flight_number': flightNumberController.text,
         'source': sourceController.text,
         'destination': destinationController.text,
-        'departure_time': Timestamp.fromDate(departureDateTime!),
-        'arrival_time': Timestamp.fromDate(arrivalDateTime!),
-        'prices': [
+        'departure_time': Timestamp.fromDate(departureDate!),
+        'arrival_time': Timestamp.fromDate(arrivalDate!),
+        'Prices': [
           int.parse(economyPriceController.text), // Economy
           int.parse(businessPriceController.text), // Business
           int.parse(firstClassPriceController.text) // First Class
         ],
-        'seats': [
+        'Seats': [
           int.parse(seatsEconomyController.text), // Economy
           int.parse(seatsBusinessController.text), // Business
           int.parse(seatsFirstClassController.text) // First Class
         ],
-        'status': flightStatus,
+        'Status': flightStatus,
       };
 
       // Save to Firestore
@@ -140,31 +139,20 @@ class _AdminPageState extends State<AdminPage> {
     );
   }
 
-  Widget buildDateTimePicker(String label,
-      Function(DateTime) onDateTimeSelected, DateTime? selectedDateTime) {
+  Widget buildDatePicker(String label, Function(DateTime) onDateSelected,
+      DateTime? selectedDate) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
-        title: Text(selectedDateTime != null
-            ? DateFormat('dd/MM/yyyy HH:mm').format(selectedDateTime)
+        title: Text(selectedDate != null
+            ? DateFormat('dd/MM/yyyy').format(selectedDate)
             : label),
         trailing: Icon(Icons.calendar_today),
         onTap: () async {
           DateTime? pickedDate = await pickDate(context);
-          if (pickedDate == null) return;
-
-          TimeOfDay? pickedTime = await pickTime(context);
-          if (pickedTime == null) return;
-
-          DateTime combinedDateTime = DateTime(
-            pickedDate.year,
-            pickedDate.month,
-            pickedDate.day,
-            pickedTime.hour,
-            pickedTime.minute,
-          );
-
-          onDateTimeSelected(combinedDateTime);
+          if (pickedDate != null) {
+            onDateSelected(pickedDate);
+          }
         },
       ),
     );
@@ -176,13 +164,6 @@ class _AdminPageState extends State<AdminPage> {
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
-    );
-  }
-
-  Future<TimeOfDay?> pickTime(BuildContext context) async {
-    return showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
     );
   }
 }
