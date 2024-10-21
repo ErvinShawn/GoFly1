@@ -214,6 +214,7 @@ class TicketDetailsPage extends StatefulWidget {
 class _TicketDetailsPageState extends State<TicketDetailsPage> {
   String? _userEmail;
   List<Map<String, dynamic>> _bookings = [];
+  List<String> _bookingIds = [];
 
   @override
   void initState() {
@@ -244,6 +245,7 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
           .get();
 
       List<Map<String, dynamic>> upcomingBookings = [];
+      List<String> bookingIds = [];
       DateTime now = DateTime.now();
 
       for (var doc in snapshot.docs) {
@@ -255,11 +257,13 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
         // Check if the booking's departure is after the current time (upcoming)
         if (departureDate.isAfter(now)) {
           upcomingBookings.add(data);
+          bookingIds.add(doc.id); // Store the document ID for later deletion
         }
       }
 
       setState(() {
         _bookings = upcomingBookings;
+        _bookingIds = bookingIds;
       });
     } catch (e) {
       print('Error fetching bookings: $e');
@@ -268,9 +272,22 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
 
   // Helper method to parse departure time
   DateTime _parseDate(String dateTimeStr) {
-    // Assuming the format is "2024-10-31 – 24:00", we'll extract the date and parse it
     String formattedStr = dateTimeStr.split(" – ")[0];
     return DateTime.parse(formattedStr);
+  }
+
+  // Method to delete a booking
+  Future<void> _deleteBooking(String bookingId, int index) async {
+    try {
+      await FirebaseFirestore.instance.collection('Booking').doc(bookingId).delete();
+
+      setState(() {
+        _bookings.removeAt(index); // Remove the booking locally
+        _bookingIds.removeAt(index); // Remove the corresponding booking ID
+      });
+    } catch (e) {
+      print('Error deleting booking: $e');
+    }
   }
 
   @override
@@ -303,18 +320,23 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
               itemCount: _bookings.length,
               itemBuilder: (context, index) {
                 final booking = _bookings[index];
-                return TicketCard(booking: booking);
+                final bookingId = _bookingIds[index];
+                return TicketCard(
+                  booking: booking,
+                  onDelete: () => _deleteBooking(bookingId, index),
+                );
               },
             ),
     );
   }
 }
 
-// Ticket Card Widget to display individual booking details
+// Ticket Card Widget to display individual booking details with delete button
 class TicketCard extends StatelessWidget {
   final Map<String, dynamic> booking;
+  final VoidCallback onDelete;
 
-  const TicketCard({required this.booking, super.key});
+  const TicketCard({required this.booking, required this.onDelete, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -322,7 +344,7 @@ class TicketCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       margin: const EdgeInsets.symmetric(vertical: 20),
       child: SizedBox(
-        height: 150,
+        height: 180,
         child: Stack(
           children: [
             Positioned.fill(
@@ -379,6 +401,10 @@ class TicketCard extends StatelessWidget {
                       ],
                     ),
                   ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: onDelete,
+                  ),
                 ],
               ),
             ),
@@ -388,6 +414,7 @@ class TicketCard extends StatelessWidget {
     );
   }
 }
+
 
 
 class AboutUsPage extends StatelessWidget {
