@@ -3,6 +3,10 @@ import 'dart:math'; // For generating random Booking ID
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'payment.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 class BookingPage extends StatefulWidget {
   final String flightName;
@@ -125,12 +129,57 @@ class _BookingPageState extends State<BookingPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Booking saved successfully!')),
       );
+      await _generatePdf();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error saving booking: $e')),
       );
     }
   }
+
+ 
+  Future<void> _generatePdf() async {
+  final pdf = pw.Document();
+
+  // Add content to the PDF
+  pdf.addPage(
+    pw.Page(
+      build: (pw.Context context) {
+        return pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text('GoFly Booking Details', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
+            pw.SizedBox(height: 20),
+            pw.Text('Booking ID: $_bookingId'),
+            pw.Text('User Email: $_userEmail'),
+            pw.SizedBox(height: 10),
+            pw.Text('Flight Name: ${widget.flightName}'),
+            pw.Text('Source: ${widget.source}'),
+            pw.Text('Destination: ${widget.destination}'),
+            pw.Text('Departure: ${widget.departureTime}'),
+            pw.Text('Arrival: ${widget.arrivalTime}'),
+            pw.Text('Seat: $_selectedSeat'),
+            pw.Text('Meal: $_selectedMeal ($_mealCount)'),
+            pw.SizedBox(height: 10),
+            pw.Text('Total Amount: ₹${_calculateTotalAmount()}'),
+            pw.SizedBox(height: 20),
+            pw.Text('Booking Date: ${DateTime.now()}'),
+          ],
+        );
+      },
+    ),
+  );
+
+  // Save the PDF to a temporary directory
+  final output = await getTemporaryDirectory();
+  final file = File("${output.path}/booking_${_bookingId}.pdf");
+  await file.writeAsBytes(await pdf.save());
+
+  // Share the PDF with the user
+  await Printing.sharePdf(bytes: await pdf.save(), filename: 'booking_${_bookingId}.pdf');
+}
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -258,6 +307,8 @@ class _BookingPageState extends State<BookingPage> {
               const SizedBox(height: 20),
               _buildTotalAmount(),
               const SizedBox(height: 20),
+             
+
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -277,6 +328,7 @@ class _BookingPageState extends State<BookingPage> {
                         builder: (context) => PaymentPage(
                           bookingId: _bookingId,
                           totalAmount: _calculateTotalAmount(),
+
                         ),
                       ),
                     );
@@ -382,3 +434,4 @@ class _BookingPageState extends State<BookingPage> {
     );
   }
 }
+
